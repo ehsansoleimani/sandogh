@@ -10,4 +10,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserDAO extends CrudRepository<User, Long> {
     boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
+
+    public User findByEmail(String email);
 }
