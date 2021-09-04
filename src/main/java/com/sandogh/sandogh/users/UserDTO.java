@@ -12,11 +12,14 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDTO {
-    @Length(min = 6, message = "password lenght should not be less than 6 chars")
+    @Length(min = 2, message = "username lenght should not be less than 2 chars")
+    @NotNull
     private String username;
-
+    @Length(min = 6, message = "password lenght should not be less than 6 chars")
+    @NotNull
     private String password;
     @Length(min = 8, message = "phonenumber lenght should not be less than 8 chars")
+    @NotNull
     private String phoneNumber;
     @Email(message = "email is invalid")
     @NotNull
