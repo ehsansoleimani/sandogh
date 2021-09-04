@@ -4,7 +4,6 @@ import com.sandogh.sandogh.base.exceptions.ServiceErrorHelper;
 import com.sandogh.sandogh.base.exceptions.ServiceException;
 import com.sandogh.sandogh.base.utils.PasswordEncryptionUtils;
 import com.sandogh.sandogh.users.UserDTO;
-import com.sandogh.sandogh.users.dao.UserDAO;
 import com.sandogh.sandogh.users.entity.User;
 import com.sandogh.sandogh.users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +26,13 @@ public class HomePageController {
     @Autowired
     UserService userService;
     @Autowired
-    UserDAO userDAO;
-    @Autowired
     private ServiceErrorHelper serviceErrorHelper;
+
+    @GetMapping("/")
+    public String showIndex(Model model) {
+        model.addAttribute("showText", "Users management");
+        return "index";
+    }
 
     @GetMapping("/users")
     public String showUsers(Model model) {
@@ -38,16 +41,10 @@ public class HomePageController {
         return "users_managment";
     }
 
-    @GetMapping("/")
-    public String showIndex(Model model) {
-        model.addAttribute("showText", "Spring framwork");
-
-        return "index";
-    }
 
     @GetMapping("/showNewUserForm")
     public String showNewUserForm(Model model) {
-        User user = new User();
+        UserDTO user = new UserDTO();
         model.addAttribute("user", user);
         return "newuserform";
 
@@ -55,12 +52,13 @@ public class HomePageController {
 
     @GetMapping("/addnewuser")
     public String signUpPage(Model model) {
-        model.addAttribute("user", new User());
+        User user = new User();
+        model.addAttribute("user", user);
         return "newuserform";
     }
 
     @PostMapping("/addnewuser")
-    public String postSignUp(@Valid @ModelAttribute UserDTO user, BindingResult bindingResult,
+    public String postSignUp(@Valid @ModelAttribute User user, BindingResult bindingResult,
                              RedirectAttributes attributes) throws ServiceException {
         if (bindingResult.hasErrors()) {
             return "newuserform";
@@ -88,8 +86,15 @@ public class HomePageController {
 
         attributes.addFlashAttribute("success_message", "user created successfully !");
         attributes.addFlashAttribute("success_class", "alert alert-success");
-        return "redirect:/users";
+        return "redirect:/addnewuser";
 
+    }
+
+
+    @GetMapping("/deleteUser/{id}")
+    public String deleteUser(@PathVariable(value = "id") long id) {
+        userService.getDeleteUser(id);
+        return "redirect:/users";
     }
 
     @GetMapping("/showFormForUpdate/{id}")
@@ -103,26 +108,27 @@ public class HomePageController {
 
     }
 
-    @GetMapping("/deleteUser/{id}")
-    public String deleteUser(@PathVariable(value = "id") long id) {
-        userService.getDeleteUser(id);
-        return "redirect:/users";
-    }
-
     @PostMapping("/updateuser")
     public String updateUser(@Valid @ModelAttribute User user, BindingResult bindingResult,
                              RedirectAttributes attributes) {
         if (bindingResult.hasErrors()) {
-            return "newuserform";
+            return "update_user";
         }
         PasswordEncryptionUtils passwordEncryptionUtils = new PasswordEncryptionUtils();
         String password = passwordEncryptionUtils.getHashedPasswordAndSaltCombination(user.getPassword());
         user.setPassword(password);
-        userDAO.save(user);
-        attributes.addFlashAttribute("success_message", "user created successfully !");
+        userService.saveUser(user);
+        attributes.addFlashAttribute("success_message", "user updated successfully !");
         attributes.addFlashAttribute("success_class", "alert alert-success");
-        return "redirect:/addnewuser";
+        return "redirect:/updateuser";
 
+    }
+
+    @GetMapping("/updateuser")
+    public String updatePage(Model model) {
+        User user = new User();
+        model.addAttribute("user", user);
+        return "update_user";
     }
 
 
