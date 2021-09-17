@@ -3,20 +3,17 @@ package com.sandogh.sandogh.home;
 import com.sandogh.sandogh.base.exceptions.ServiceErrorHelper;
 import com.sandogh.sandogh.base.exceptions.ServiceException;
 import com.sandogh.sandogh.base.utils.PasswordEncryptionUtils;
-import com.sandogh.sandogh.users.UserDTO;
 import com.sandogh.sandogh.users.entity.User;
 import com.sandogh.sandogh.users.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.validation.Valid;
+import java.time.LocalDateTime;
 
 /**
  * @author Ehsan Soleimani (esoleimani@voipfuture.com)
@@ -30,30 +27,27 @@ public class HomePageController {
 
     @GetMapping("/")
     public String showIndex(Model model) {
-        model.addAttribute("showText", "Users management");
         return "index";
     }
 
     @GetMapping("/users")
     public String showUsers(Model model) {
-        model.addAttribute("showText", "Users List");
         model.addAttribute("userlist", userService.getAllUser());
         return "users_managment";
     }
 
-
     @GetMapping("/showNewUserForm")
     public String showNewUserForm(Model model) {
-        UserDTO user = new UserDTO();
+        User user = new User();
         model.addAttribute("user", user);
         return "newuserform";
-
     }
 
     @GetMapping("/addnewuser")
     public String signUpPage(Model model) {
         User user = new User();
         model.addAttribute("user", user);
+        model.addAttribute("localDateTime", LocalDateTime.now());
         return "newuserform";
     }
 
@@ -77,19 +71,10 @@ public class HomePageController {
                 return "redirect:/addnewuser";
             }
         }
-
-//        PasswordEncryptionUtils passwordEncryptionUtils = new PasswordEncryptionUtils();
-//        String password = passwordEncryptionUtils.getHashedPasswordAndSaltCombination(user.getPassword());
-//        user.setPassword(password);
-//
-//        userDAO.save(user);
-
         attributes.addFlashAttribute("success_message", "user created successfully !");
         attributes.addFlashAttribute("success_class", "alert alert-success");
         return "redirect:/addnewuser";
-
     }
-
 
     @GetMapping("/deleteUser/{id}")
     public String deleteUser(@PathVariable(value = "id") long id) {
@@ -99,13 +84,9 @@ public class HomePageController {
 
     @GetMapping("/showFormForUpdate/{id}")
     public String showFormForUpdate(@PathVariable(value = "id") long id, Model model) {
-        //get User from server
         User user = userService.getUserById(id);
-
-        // set user
         model.addAttribute("user", user);
         return "update_user";
-
     }
 
     @PostMapping("/updateuser")
@@ -114,14 +95,11 @@ public class HomePageController {
         if (bindingResult.hasErrors()) {
             return "update_user";
         }
-        PasswordEncryptionUtils passwordEncryptionUtils = new PasswordEncryptionUtils();
-        String password = passwordEncryptionUtils.getHashedPasswordAndSaltCombination(user.getPassword());
-        user.setPassword(password);
-        userService.saveUser(user);
+        userService.getDeleteUser(user.getId());
+        User userEntity = userService.createNewUser(user.getUsername(), user.getPassword(), user.getEmail(), user.getPhoneNumber(), user.getToken(), user.isActive(), user.getRolelist());
         attributes.addFlashAttribute("success_message", "user updated successfully !");
         attributes.addFlashAttribute("success_class", "alert alert-success");
         return "redirect:/updateuser";
-
     }
 
     @GetMapping("/updateuser")
@@ -131,5 +109,24 @@ public class HomePageController {
         return "update_user";
     }
 
+    @GetMapping("/login")
+    public String getLoginPage() {
+        return "login";
+    }
+
+    @GetMapping("/activation/{token}")
+    public String activeUserByToken(@PathVariable("token") String token) {
+        token = token.replace("'", "");
+
+        if (userService.userByTokenExists(token)) {
+            userService.activeUser(token);
+        }
+        return "redirect:/login";
+    }
+
+    @GetMapping("/profile")
+    public String getProfilePage() {
+        return "profile";
+    }
 
 }

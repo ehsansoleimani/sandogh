@@ -12,33 +12,31 @@
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
                 <div class="panel panel-default">
-                    <div class="panel-heading"> Update !</div>
+                    <div class="panel-heading">[[#{button.users.update}]]</div>
                     <div class="panel-body">
                         <form th:object="${user}" method="post" th:action="@{'/updateuser'}" action="#">
                             <div class="form-group">
                                 <input type="number" th:field="*{id}" class="form-control" required="required">
+                                <div th:if="${#fields.hasErrors('id')}" th:errors="*{id}"></div>
                             </div>
-                            <div class="form-group">
-                                <input type="text" th:field="*{username}" class="form-control" required="required">
-                                <div th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
 
-                            </div>
                             <div class="form-group">
                                 <input type="email" th:field="*{email}" class="form-control" required="required">
                                 <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
-
                             </div>
+
                             <div class="form-group">
                                 <input type="tel" th:field="*{phoneNumber}" class="form-control" required="required">
                                 <div th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
-
                             </div>
+
                             <div class="form-group">
                                 <input type="password" th:field="*{password}" class="form-control" required="required"
                                        placeholder="password">
                                 <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                             </div>
-                            <button class="btn btn-primary" type="submit">Update</button>
+
+                            <button class="btn btn-primary" type="submit">[[#{button.users.update}]]</button>
 
                         </form>
                         <br>
@@ -46,9 +44,8 @@
                              th:class="${success_class}"></div>
                     </div>
                     <div class="container my-2">
-                        <h1 th:text="${showText}"></h1>
-                        <a th:href="@{/showNewUserForm}" class="btn btn-primary btn-sm mb-3">Add New User</a>
-                        <a th:href="@{/users}" class="btn btn-primary btn-sm mb-3"> Show User</a>
+                        <a th:href="@{/showNewUserForm}" class="btn btn-primary btn-sm mb-3">[[#{button.users.create}]]</a>
+                        <a th:href="@{/users}" class="btn btn-primary btn-sm mb-3">[[#{button.users.list}]]</a>
 
                     </div>
                 </div>
