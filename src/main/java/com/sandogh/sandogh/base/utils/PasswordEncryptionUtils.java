@@ -1,6 +1,7 @@
 package com.sandogh.sandogh.base.utils;
 
 import org.apache.commons.lang3.Validate;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
@@ -76,5 +77,4 @@ public class PasswordEncryptionUtils {
         Validate.isTrue(split.length == 2, "Invalid salt and hash combination");
         return verifyPassword(password, split[0], split[1]);
     }
-
 }

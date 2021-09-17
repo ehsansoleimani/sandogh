@@ -8,9 +8,9 @@
 <body>
 <div th:replace="fragmentes/header :: header"/>
 <div class="container my-2">
-    <h1 th:text="${showText}"></h1>
-    <a th:href="@{/showNewUserForm}" class="btn btn-primary btn-sm mb-3">Add New User</a>
-    <a th:href="@{/users}" class="btn btn-primary btn-sm mb-3"> Show User</a>
+    <h1>[[#{button.users.management}]]</h1>
+    <a th:href="@{/showNewUserForm}" class="btn btn-primary btn-sm mb-3">[[#{button.users.create}]]</a>
+    <a th:href="@{/users}" class="btn btn-primary btn-sm mb-3">[[#{button.users.list}]]</a>
 
 
 </div>
