@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import javax.validation.Valid;
 import java.time.LocalDateTime;
 
@@ -33,39 +32,32 @@ public class HomePageController {
     @GetMapping("/users")
     public String showUsers(Model model) {
         model.addAttribute("userlist", userService.getAllUser());
-        return "users_managment";
+        return "users";
     }
 
-    @GetMapping("/showNewUserForm")
-    public String showNewUserForm(Model model) {
-        User user = new User();
-        model.addAttribute("user", user);
-        return "newuserform";
-    }
-
-    @GetMapping("/addnewuser")
-    public String signUpPage(Model model) {
-        User user = new User();
-        model.addAttribute("user", user);
+    @GetMapping("/users/new")
+    public String showNewForm(Model model) {
         model.addAttribute("localDateTime", LocalDateTime.now());
-        return "newuserform";
+        model.addAttribute("user", new User());
+        model.addAttribute("pageTitle", "Add New User");
+        return "user_form";
     }
 
-    @PostMapping("/addnewuser")
-    public String postSignUp(@Valid @ModelAttribute User user, BindingResult bindingResult,
-                             RedirectAttributes attributes) throws ServiceException {
+    @PostMapping("/users/save")
+    public String saveUser(@Valid @ModelAttribute User user, BindingResult bindingResult,
+                           RedirectAttributes attributes) throws ServiceException {
         if (bindingResult.hasErrors()) {
-            return "newuserform";
+            return "user_form";
         }
         final User userEntity;
         try {
-            userEntity = userService.createNewUser(user.getUsername(), user.getPassword(), user.getEmail(), user.getPhoneNumber());
+            userEntity = userService.createNewUser(user);
         } catch(ServiceException e) {
             if (serviceErrorHelper.handleError(e, UserService.UserServiceErrorMessages.USER_ALREADY_EXISTS, new ServiceErrorHelper.ServiceErrorConsumer() {
                 @Override
                 public void handle(String errorCode, Object[] params) {
-                    attributes.addFlashAttribute("user_exists_message", "email already exists !");
-                    attributes.addFlashAttribute("warning_class", "alert alert-warning");
+                    attributes.addFlashAttribute("success_message", "user created successfully !");
+                    attributes.addFlashAttribute("success_class", "alert alert-success");
                 }
             })) {
                 return "redirect:/addnewuser";
@@ -73,40 +65,34 @@ public class HomePageController {
         }
         attributes.addFlashAttribute("success_message", "user created successfully !");
         attributes.addFlashAttribute("success_class", "alert alert-success");
-        return "redirect:/addnewuser";
+        return "redirect:/users/new";
+
+
     }
 
-    @GetMapping("/deleteUser/{id}")
+    @GetMapping("/users/edit/{id}")
+    public String showEditForm(@PathVariable(value = "id") long id, Model model, RedirectAttributes redirectAttributes) {
+        try {
+            User user = userService.getUserById(id);
+            model.addAttribute("user", user);
+            model.addAttribute("pageTitle", "Update User(ID : " + id + ")");
+            return "user_form";
+
+        } catch (ServiceException e) {
+            serviceErrorHelper.handleError(e, UserService.UserServiceErrorMessages.USER_NOT_FOUND, new ServiceErrorHelper.ServiceErrorConsumer() {
+                @Override
+                public void handle(String errorCode, Object[] params) {
+                    redirectAttributes.addFlashAttribute("success_message", "user updated successfully !");
+                }
+            });
+            return "redirect:/users";
+        }
+    }
+
+    @GetMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable(value = "id") long id) {
         userService.getDeleteUser(id);
         return "redirect:/users";
-    }
-
-    @GetMapping("/showFormForUpdate/{id}")
-    public String showFormForUpdate(@PathVariable(value = "id") long id, Model model) {
-        User user = userService.getUserById(id);
-        model.addAttribute("user", user);
-        return "update_user";
-    }
-
-    @PostMapping("/updateuser")
-    public String updateUser(@Valid @ModelAttribute User user, BindingResult bindingResult,
-                             RedirectAttributes attributes) {
-        if (bindingResult.hasErrors()) {
-            return "update_user";
-        }
-        userService.getDeleteUser(user.getId());
-        User userEntity = userService.createNewUser(user.getUsername(), user.getPassword(), user.getEmail(), user.getPhoneNumber(), user.getToken(), user.isActive(), user.getRolelist());
-        attributes.addFlashAttribute("success_message", "user updated successfully !");
-        attributes.addFlashAttribute("success_class", "alert alert-success");
-        return "redirect:/updateuser";
-    }
-
-    @GetMapping("/updateuser")
-    public String updatePage(Model model) {
-        User user = new User();
-        model.addAttribute("user", user);
-        return "update_user";
     }
 
     @GetMapping("/login")

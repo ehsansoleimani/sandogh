@@ -20,33 +20,33 @@ import java.util.List;
  * @author Ehsan Soleimani (esoleimani@voipfuture.com)
  **/
 @Entity
-@Table(name = "table_user")
+@Table(name = "users")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class User extends BaseEntity {
 
-    @Column(name = "user_name")
-    @Length(min = 2, message = "username lenght should not be less than 2 chars")
-    private String username;
-
     @Column(name = "password")
     @Length(min = 6, message = "password lenght should not be less than 6 chars")
     private String password;
 
-    @Column(name = "phonenumber")
+    @Column(name = "phone_number")
     @Length(min = 8, message = "phonenumber lenght should not be less than 8 chars")
     private String phoneNumber;
 
-    @Column(name = "email", unique = true)
+    @Column(name = "email")
     @Email(message = "email is invalid")
     @NotNull
     private String email;
 
+    @Column(name = "token")
     private String token;
+
+    @Column(name = "active")
     private boolean active;
+
     @OneToMany(mappedBy = "user")
-    public List<Role> rolelist=new ArrayList<>();
+    public List<Role> roles = new ArrayList<>();
 
 
 }

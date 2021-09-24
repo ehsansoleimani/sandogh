@@ -15,9 +15,11 @@ import javax.transaction.Transactional;
 @Repository
 public interface UserDAO extends CrudRepository<User, Long> {
 
-    boolean existsByUsername(String username);
-
     boolean existsByEmail(String email);
+
+    public User findByEmail(String email);
+
+    boolean existsById(long id);
 
     boolean existsByToken(String token);
 

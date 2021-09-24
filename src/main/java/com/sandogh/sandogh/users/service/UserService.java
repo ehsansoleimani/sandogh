@@ -1,18 +1,16 @@
 package com.sandogh.sandogh.users.service;
 
 import com.sandogh.sandogh.base.exceptions.ServiceException;
-import com.sandogh.sandogh.base.utils.PasswordEncryptionUtils;
 import com.sandogh.sandogh.users.dao.UserDAO;
 import com.sandogh.sandogh.users.entity.User;
 import com.sandogh.sandogh.utils.TokenUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.Validate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
+
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
@@ -39,49 +37,53 @@ public class UserService {
         this.userDAO.deleteById(id);
     }
 
+    public User getEmail(String email) {
+        return this.userDAO.findByEmail(email);
+    }
+
     public void saveUser(User user) {
         this.userDAO.save(user);
     }
 
-    public User getUserById(long id) {
+    public User getUserById(long id) throws ServiceException {
         Optional<User> optional = userDAO.findById(id);
-        User user = null;
+
         if (optional.isPresent()) {
-            user = optional.get();
+            return optional.get();
         } else {
-            throw new RuntimeException("user not found for id ::" + id);
+            throw new ServiceException(UserServiceErrorMessages.USER_NOT_FOUND, id);
         }
-        return user;
+
     }
 
     private final Object CREATE_USER_LOCK = new Object();
 
-    public User createNewUser(String username, String password, String email, String phoneNumber, String token, boolean active, List rolelist) {
-        Validate.notNull(username);
-        Validate.notBlank(username);
-        Validate.notNull(password);
-        Validate.notBlank(password);
-        if (userDAO.existsByUsername(username)) {
-            throw new ServiceException(UserServiceErrorMessages.USER_ALREADY_EXISTS, username);
+    public User createNewUser(User user) throws ServiceException {
+        ;
+        if (userDAO.existsByEmail(user.getEmail())) {
+            throw new ServiceException(UserServiceErrorMessages.USER_ALREADY_EXISTS, user.getEmail());
         }
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        String hashedPassword = bCryptPasswordEncoder.encode(password);
-        User user = new User(username, hashedPassword, phoneNumber, email, token, active, rolelist);
+        String hashedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+        user.setPassword(hashedPassword);
         user.setCreationDate(LocalDateTime.now());
-        active = false;
-        token = String.format("%s%s", bCryptPasswordEncoder.encode(user.getEmail()),
+        user.setActive(false);
+        String token = String.format("%s%s", bCryptPasswordEncoder.encode(user.getEmail()),
                 TokenUtil.generateRandomToken());
         token = token.replace("/", "");
         user.setToken(token);
         String activationLink = String.format(
                 "<a href='http://127.0.0.1:8080/activation/%s'>active your account </a>", user.getToken());
         send(user.getEmail(), "activation link", activationLink);
-        user.setUsername(user.getEmail());
         return userDAO.save(user);
     }
 
     public boolean userByEmailExists(String email) {
         return userDAO.existsByEmail(email);
+    }
+
+    public boolean userByIdExists(long id) {
+        return userDAO.existsById(id);
     }
 
     public void send(String to, String subject, String body) {
@@ -116,9 +118,9 @@ public class UserService {
     }
 
 
-
     public interface UserServiceErrorMessages {
         String USER_SERVICE_ERROR_PREFIX = "user.";
         String USER_ALREADY_EXISTS = USER_SERVICE_ERROR_PREFIX + "alreadyExists";
+        String USER_NOT_FOUND = USER_SERVICE_ERROR_PREFIX + "notFound";
     }
 }

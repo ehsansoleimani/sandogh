@@ -31,8 +31,8 @@ public class profileSecurity extends WebSecurityConfigurerAdapter {
             Exception {
 
         auth.jdbcAuthentication().dataSource(dataSource).usersByUsernameQuery(
-                        "select user_name,password,active from table_user where user_name=?"
-                ).authoritiesByUsernameQuery("select r.user,r.role from role r JOIN table_user on r.user=table_user.id and table_user.user_name=?"
+                        "select email,password,active from users where email=?"
+                ).authoritiesByUsernameQuery("select r.user,r.role from role r JOIN users on r.user=users.id and users.email=?"
                 )
                 .passwordEncoder(new BCryptPasswordEncoder());
     }
