@@ -2,6 +2,7 @@ package com.sandogh.sandogh.users.service;
 
 import com.sandogh.sandogh.users.dao.UserDAO;
 import com.sandogh.sandogh.users.entity.User;
+import com.sandogh.sandogh.users.exceptions.userNotFoundException;
 import com.sandogh.sandogh.utils.TokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,42 +36,50 @@ public class UserService {
         this.userDAO.deleteById(id);
     }
 
+    public User getEmail(String email) {
+        return this.userDAO.findByEmail(email);
+    }
+
     public void saveUser(User user) {
         this.userDAO.save(user);
     }
 
-    public User getUserById(long id) {
+    public User getUserById(long id) throws userNotFoundException {
         Optional<User> optional = userDAO.findById(id);
-        User user = null;
+
         if (optional.isPresent()) {
-            user = optional.get();
+            return optional.get();
         } else {
-            throw new RuntimeException("user not found for id ::" + id);
+            throw new userNotFoundException("could not found user with ID" + id);
         }
-        return user;
+
     }
 
     private final Object CREATE_USER_LOCK = new Object();
 
-    public User createNewUser(String username, String password, String email, String phoneNumber, String token, boolean active, List rolelist) {
+
+    public User createUser(User user) {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
-        String hashedPassword = bCryptPasswordEncoder.encode(password);
-        User user = new User(username, hashedPassword, phoneNumber, email, token, active, rolelist);
+        String hashedPassword = bCryptPasswordEncoder.encode(user.getPassword());
+        user.setPassword(hashedPassword);
         user.setCreationDate(LocalDateTime.now());
-        active = false;
-        token = String.format("%s%s", bCryptPasswordEncoder.encode(user.getEmail()),
+        user.setActive(false);
+        String token = String.format("%s%s", bCryptPasswordEncoder.encode(user.getEmail()),
                 TokenUtil.generateRandomToken());
         token = token.replace("/", "");
         user.setToken(token);
         String activationLink = String.format(
                 "<a href='http://127.0.0.1:8080/activation/%s'>active your account </a>", user.getToken());
         send(user.getEmail(), "activation link", activationLink);
-        user.setUsername(user.getEmail());
         return userDAO.save(user);
     }
 
     public boolean userByEmailExists(String email) {
         return userDAO.existsByEmail(email);
+    }
+
+    public boolean userByIdExists(long id) {
+        return userDAO.existsById(id);
     }
 
     public void send(String to, String subject, String body) {

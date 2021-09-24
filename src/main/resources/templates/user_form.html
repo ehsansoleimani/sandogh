@@ -2,66 +2,54 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>User Managment system</title>
+    <title>[[${pageTitle}]]</title>
     <div th:replace="fragmentes/header :: header-css"/>
 </head>
 <body>
 <div th:replace="fragmentes/header :: header"/>
 <div>
-
     <div class="container">
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
                 <div class="panel panel-default">
-                    <div class="panel-heading">[[#{button.users.create}]]</div>
+                    <div class="panel-heading">[[${pageTitle}]]</div>
                     <div class="panel-body">
-                        <form th:object="${user}" method="post" th:action="@{'/addnewuser'}" action="#">
-
+                        <form th:object="${user}" method="post" th:action="@{'/users/save'}" action="#">
+                            <input type="hidden" th:field="*{id}">
                             <div class="form-group">
-                                <input type="email" th:field="*{email}" class="form-control" required="required"
-                                       placeholder="email">
+                                <input type="email" th:field="*{email}" class="form-control" required="required" min="4"
+                                       max="45" th:placeholder="#{user.email}">
                                 <div th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></div>
                             </div>
-
                             <div class="form-group">
                                 <input type="text" th:field="*{phoneNumber}" class="form-control" required="required"
-                                       placeholder="phoneNumber">
+                                       th:placeholder="#{user.phonenumber}">
                                 <div th:if="${#fields.hasErrors('phoneNumber')}" th:errors="*{phoneNumber}"></div>
-
                             </div>
                             <div class="form-group">
                                 <input type="password" th:field="*{password}" class="form-control" required="required"
-                                       placeholder="password">
+                                       min="6" max="40" th:placeholder="#{user.password}">
                                 <div th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
                             </div>
                             <div>
                                 <label th:text="${#dates.format(#dates.createNow(), 'dd MMM yyyy HH:mm')}"></label>
                             </div>
                             <button class="btn btn-primary" type="submit">[[#{button.users.save}]]</button>
-
                         </form>
                         <br>
                         <div th:if="${success_message !=''}" th:text="${success_message}"
                              th:class="${success_class}"></div>
                         <div th:if="${user_exists_message !=''}" th:text="${user_exists_message}"
                              th:class="${warning_class}"></div>
-
                     </div>
                     <div class="container my-2">
                         <a th:href="@{/users}" class="btn btn-primary btn-sm mb-3">[[#{button.users.list}]]</a>
                     </div>
-
                 </div>
-
-
             </div>
         </div>
-
     </div>
 </div>
-
-
 </div>
-
 </body>
 </html>
