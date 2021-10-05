@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="ISO-8859-1">
+    <title>Insert title here</title>
+    <div th:replace="fragmentes/header :: header-css"/>
+</head>
+<body>
+<div th:replace="fragmentes/header :: header"/>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 col-md-offset-3">
+            <div class="panel panel-primary">
+                <div class="panel-heading">[[#{menu.users.login}]]</div>
+                <div class="panel-body">
+                    <form th:href="@{'/login'}" method="post">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <div class="form-group">
+                            <input type="email" name="username" placeholder="email" required="required"
+                                   class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" name="password" placeholder="password" required="required"
+                                   class="form-control">
+                        </div>
+                        <button type="submit" class="btn btn-primary">[[#{menu.users.login}]]</button>
+                        <div th:if="${param.error}">
+                            incorrect Username or Password
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

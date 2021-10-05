@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>User Managment</title>
+    <div th:replace="fragmentes/header :: header-css"/>
+</head>
+<body>
+<div th:replace="fragmentes/header :: header"/>
+<div class="container my-2">
+    <h1>[[#{button.users.management}]]</h1>
+    <a th:href="@{/users/new}" class="btn btn-primary btn-sm mb-3">[[#{button.users.create}]]</a>
+    <a th:href="@{/users}" class="btn btn-primary btn-sm mb-3">[[#{button.users.list}]]</a>
+
+
+</div>
+</body>
+</html>

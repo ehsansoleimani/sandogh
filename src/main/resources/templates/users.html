@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Manage Users</title>
+    <div th:replace="fragmentes/header :: header-css"/>
+
+    <link href="../static/css/table.css" th:href="@{/css/table.css}" rel="stylesheet"/>
+</head>
+<body>
+<div th:replace="fragmentes/header :: header"/>
+<div class="container my-2 ">
+    <h1>[[#{button.users.list}]]</h1>
+    <div>
+        <a th:href="@{/users/new}" class="btn btn-primary btn-sm mb-3">[[#{button.users.create}]]</a>
+
+    </div>
+    <table class="table table-striped table-responsive-sm table-bordered">
+        <thead>
+        <tr>
+            <th>[[#{table.user.username}]]</th>
+            <th>[[#{table.user.phonenumber}]]</th>
+            <th>[[#{table.user.action}]]</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="user : ${userlist}">
+            <td th:text="${user.email}"></td>
+            <td th:text="${user.phoneNumber}"></td>
+            <td>
+                <a th:href="@{'/users/edit/' + ${user.id}}" class="btn btn-primary">[[#{button.users.update}]]</a>
+                <a th:href="@{'/users/delete/' + ${user.id}}" class="btn btn-danger">[[#{button.users.delete}]]</a>
+            </td>
+
+        </tr>
+        </tbody>
+    </table>
+
+</div>
+</body>
+</html>
