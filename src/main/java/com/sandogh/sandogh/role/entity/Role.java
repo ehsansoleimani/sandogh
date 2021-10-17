@@ -1,4 +1,4 @@
-package com.sandogh.sandogh.role;
+package com.sandogh.sandogh.role.entity;
 
 import com.sandogh.sandogh.base.entity.BaseEntity;
 import com.sandogh.sandogh.users.entity.User;

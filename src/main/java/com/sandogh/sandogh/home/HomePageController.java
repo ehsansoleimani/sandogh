@@ -91,6 +91,7 @@ public class HomePageController {
 
     @GetMapping("/users/delete/{id}")
     public String deleteUser(@PathVariable(value = "id") long id) {
+
         userService.getDeleteUser(id);
         return "redirect:/users";
     }

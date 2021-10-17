@@ -1,7 +1,7 @@
 package com.sandogh.sandogh.users.entity;
 
 import com.sandogh.sandogh.base.entity.BaseEntity;
-import com.sandogh.sandogh.role.Role;
+import com.sandogh.sandogh.role.entity.Role;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

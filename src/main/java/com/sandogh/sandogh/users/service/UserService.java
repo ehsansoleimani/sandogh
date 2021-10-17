@@ -1,6 +1,7 @@
 package com.sandogh.sandogh.users.service;
 
 import com.sandogh.sandogh.base.exceptions.ServiceException;
+import com.sandogh.sandogh.role.dao.RoleDao;
 import com.sandogh.sandogh.users.dao.UserDAO;
 import com.sandogh.sandogh.users.entity.User;
 import com.sandogh.sandogh.utils.TokenUtil;
@@ -28,12 +29,15 @@ public class UserService {
     private final UserDAO userDAO;
     @Autowired
     JavaMailSender javaMailSender;
+    @Autowired
+    RoleDao roleDao;
 
     public List<User> getAllUser() {
         return (List<User>) userDAO.findAll();
     }
 
     public void getDeleteUser(long id) {
+
         this.userDAO.deleteById(id);
     }
 
