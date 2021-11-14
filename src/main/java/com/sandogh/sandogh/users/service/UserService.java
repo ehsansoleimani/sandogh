@@ -1,9 +1,9 @@
 package com.sandogh.sandogh.users.service;
 
+import com.sandogh.sandogh.base.exceptions.ServiceException;
 import com.sandogh.sandogh.base.utils.PasswordEncryptionUtils;
 import com.sandogh.sandogh.users.dao.UserDAO;
 import com.sandogh.sandogh.users.entity.User;
-import com.sandogh.sandogh.users.exceptions.UsernameAlreadyTakeException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ public class UserService {
 
     private final Object CREATE_USER_LOCK = new Object();
 
-    public User createNewUser(String username, String password, String email, String phoneNumber) throws UsernameAlreadyTakeException {
+    public User createNewUser(String username, String password, String email, String phoneNumber) throws ServiceException {
         Validate.notNull(username);
         Validate.notBlank(username);
         Validate.notNull(password);
@@ -29,7 +29,7 @@ public class UserService {
         //TODO: validate phone number
         synchronized (CREATE_USER_LOCK) {
             if (userDAO.existsByUsername(username)) {
-                throw new UsernameAlreadyTakeException(username);
+                throw new ServiceException(UserServiceErrorMessages.USER_ALREADY_EXISTS, username);
             }
             String hashedPassword = PasswordEncryptionUtils.getHashedPasswordAndSaltCombination(password);
             User user = new User(username, hashedPassword, phoneNumber, email);
@@ -37,4 +37,8 @@ public class UserService {
         }
     }
 
+    public interface UserServiceErrorMessages {
+        String USER_SERVICE_ERROR_PREFIX = "user.";
+        String USER_ALREADY_EXISTS = USER_SERVICE_ERROR_PREFIX + "alreadyExists";
+    }
 }
