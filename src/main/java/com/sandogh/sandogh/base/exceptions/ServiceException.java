@@ -28,4 +28,12 @@ public class ServiceException extends Exception {
         super(cause);
         this.errorKey = errorKey;
     }
+
+    public String getErrorKey() {
+        return errorKey;
+    }
+
+    public Object[] getParams() {
+        return params;
+    }
 }
