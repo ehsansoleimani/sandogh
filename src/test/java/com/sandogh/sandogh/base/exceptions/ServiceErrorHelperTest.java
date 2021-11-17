@@ -1,7 +1,5 @@
-package com.sandogh.sandogh.com.sandogh.sandogh.base.exceptions;
+package com.sandogh.sandogh.base.exceptions;
 
-import com.sandogh.sandogh.base.exceptions.ServiceErrorHelper;
-import com.sandogh.sandogh.base.exceptions.ServiceException;
 import org.junit.Before;
 import org.junit.Test;
 
